@@ -1,0 +1,9 @@
+0.0.0.0
+browse
+log stdout
+errors stdout
+
+chesty_stats.johnbarker.in {
+  tls john@johnbarker.in
+  proxy / grafana:3000/
+}

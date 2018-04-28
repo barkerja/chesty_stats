@@ -1,0 +1,14 @@
+{
+  "name": "ChestyStats",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "John Barker <john@johnbarker.in>",
+  "license": "MIT",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "eris": "^0.8.5",
+    "influx": "^5.0.7"
+  }
+}

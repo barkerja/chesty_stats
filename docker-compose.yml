@@ -1,0 +1,29 @@
+version: "3.5"
+
+services:
+  bot:
+    build:
+      context: ./
+    env_file:
+      - ./config/.env
+    depends_on:
+      - db
+    volumes:
+      - .:/var/bot/:cached
+  db:
+    image: influxdb
+    environment:
+      INFLUXDB_ADMIN_ENABLED: "true"
+    volumes:
+      - data:/var/lib/influxdb
+  http:
+    image: abiosoft/caddy
+    ports:
+      - 80:80
+    volumes:
+      - ./config/Caddyfile:/etc/Caddyfile
+      - ./config/.caddy:/root/.caddy
+  grafana:
+    image: grafana/grafana
+volumes:
+  data:
