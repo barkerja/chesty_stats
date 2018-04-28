@@ -1,4 +1,4 @@
-chesty_stats.johnbarker.in {
+chesty-stats.johnbarker.in {
   tls john@johnbarker.in
   log stdout
   errors stdout
