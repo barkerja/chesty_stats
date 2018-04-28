@@ -9,7 +9,7 @@ services:
     depends_on:
       - db
     volumes:
-      - .:/var/bot/:cached
+      - ./:/var/bot/
   db:
     image: influxdb
     environment:
@@ -20,6 +20,7 @@ services:
     image: abiosoft/caddy
     ports:
       - 80:80
+      - 443:443
     env_file:
       - ./config/.env
     volumes:
