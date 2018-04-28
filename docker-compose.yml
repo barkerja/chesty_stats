@@ -20,10 +20,14 @@ services:
     image: abiosoft/caddy
     ports:
       - 80:80
+    env_file:
+      - ./config/.env
     volumes:
       - ./config/Caddyfile:/etc/Caddyfile
       - ./config/.caddy:/root/.caddy
   grafana:
     image: grafana/grafana
+    env_file:
+      - ./config/.env
 volumes:
   data:
