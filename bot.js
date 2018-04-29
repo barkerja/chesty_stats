@@ -1,6 +1,11 @@
 const Eris = require('eris')
 const Influx = require('influx')
 
+const {
+  USMC_SERVER_ID,
+  ROLE_MODERATOR_ID,
+} = require('./helpers/constants')
+
 const influx = new Influx.InfluxDB({
   host: 'db',
   database: 'discord',
@@ -12,6 +17,16 @@ const influx = new Influx.InfluxDB({
         channel_name: Influx.FieldType.STRING,
         user_id: Influx.FieldType.STRING
       }
+    },
+    {
+      measurement: 'mods_onliine',
+      tags: [],
+      fields: { count: Influx.FieldType.INTEGER }
+    },
+    {
+      measure: 'members_online',
+      tags: [],
+      fields: { count: Influx.FieldType.INTEGER }
     }
   ]
 })
@@ -27,14 +42,44 @@ const BOT_ID = '439843672478056448'
 
 const bot = new Eris(process.env.DISCORD_TOKEN)
 
-const channelIds = {
-  'hiding-from-the-working-party': '406591537577984002',
+let modUpdateTimer, memberCountTimer
+
+const countOnlineModerators = async () => {
+  try {
+    const modsOnline = bot
+      .guilds
+      .find(guild => guild.id === USMC_SERVER_ID)
+      .members
+      .filter(member => member.status === 'online' && member.roles.includes(ROLE_MODERATOR_ID))
+      .length
+
+    influx.writePoints([{ measurement: 'mods_online', fields: { count: modsOnline } }])
+  } catch (error) {
+    console.error('Error updating the number of mods online:', error)
+  }
+}
+
+const countOnlineMembers = async () => {
+  try {
+    const memberCount = bot
+      .guilds
+      .find(guild => guild.id === USMC_SERVER_ID)
+      .members
+      .filter(member => member.status === 'online')
+      .length
+
+    influx.writePoints([{ measurement: 'members_online', fields: { count: memberCount } }])
+  } catch (error) {
+    console.error('Error updating the number of members:', error)
+  }
 }
 
 bot.on('ready', () => {
-  bot
-    .createMessage(105708217153126400, 'Online and collecting stats :salute:')
-    .catch(error => console.error('Error sending message:', error))
+  clearInterval(modUpdateTimer)
+  clearInterval(memberCountTimer)
+
+  modUpdateTimer = setInterval(() => countOnlineModerators(), 1000 * 60)
+  memberCountTimer = setInterval(() => countOnlineMembers(), 1000 * 60)
 
   console.log('Connected and collecting stats.')
 })
@@ -61,10 +106,6 @@ const exitHandler = async (opts, err) => {
   if (opts.cleanup) console.log('clean')
   if (err) console.log(err.stack)
   if (opts.exit) process.exit()
-
-  await bot.createMessage(105708217153126400, 'My process crashed. :salute: I shall return')
-    .then(resp => console.log('Crashed message sent...'))
-    .catch(error => console.log('Crashed message did not send...'))
 
   process.exit()
 }
