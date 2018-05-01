@@ -6,6 +6,7 @@ services:
       context: ./
     env_file:
       - ./config/.env
+    restart: always
     depends_on:
       - db
     volumes:
@@ -14,6 +15,7 @@ services:
     image: influxdb
     environment:
       INFLUXDB_ADMIN_ENABLED: "true"
+    restart: always
     volumes:
       - data:/var/lib/influxdb
   http:
@@ -23,11 +25,13 @@ services:
       - 443:443
     env_file:
       - ./config/.env
+    restart: always
     volumes:
       - ./config/Caddyfile:/etc/Caddyfile
       - ./config/.caddy:/root/.caddy
   grafana:
     image: grafana/grafana
+    restart: always
     env_file:
       - ./config/.env
 volumes:
