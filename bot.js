@@ -12,7 +12,7 @@ const influx = new Influx.InfluxDB({
   schema: [
     {
       measurement: 'timestamps',
-      tags: ['channel_name'],
+      tags: ['channel_name', 'user_id'],
       fields: {
         channel_name: Influx.FieldType.STRING,
         user_id: Influx.FieldType.STRING
@@ -93,7 +93,7 @@ bot.on('messageCreate', async (message) => {
       .writePoints([
         {
           measurement: 'timestamps',
-          tags: { channel_name: message.channel.name },
+          tags: { channel_name: message.channel.name, user_id: message.author.id },
           fields: { user_id: message.author.id }
         }
       ])
